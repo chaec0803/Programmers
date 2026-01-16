@@ -2,27 +2,31 @@ def solution(visible, hidden, k):
     n = len(visible)
     m = len(visible[0])
 
-    ans = 0
-    # === DP (bitmask enumeration) ===
-    for rowMask in range(1 << n):
-        for colMask in range(1 << m):
-            val = 0
-            # curr 생성 (기존 curr 의미 그대로)
-            curr = [[1] * m for _ in range(n)]
-            for i in range(n):
-                if (rowMask >> i) & 1:
-                    for j in range(m):
-                        curr[i][j] *= -1
-            for j in range(m):
-                for i in range(n):
-                    if (colMask >> j) & 1:
-                        curr[i][j] *= -1
-                    val += visible[i][j] if curr[i][j] == 1 else hidden[i][j]
+    ans = -10**18
 
-            cost = k * (bin(rowMask).count("1") + bin(colMask).count("1"))
-            ans = max(ans, val - cost)
+    for rowMask in range(1 << n):
+        rowCnt = bin(rowMask).count("1")
+
+        for colMask in range(1 << m):
+            colCnt = bin(colMask).count("1")
+            cost = k * (rowCnt + colCnt)
+
+            total = 0
+            min_odd = 10**18  # (i+j)%2==1 최소값
+
+            for i in range(n):
+                rf = (rowMask >> i) & 1
+                for j in range(m):
+                    flipped = rf ^ ((colMask >> j) & 1)
+                    val = hidden[i][j] if flipped else visible[i][j]
+                    total += val
+
+                    if (i + j) & 1:
+                        min_odd = min(min_odd, val)
+
+            if n % 2 == 0 and m % 2 == 0:
+                total -= min_odd
+
+            ans = max(ans, total - cost)
 
     return ans
-
-result = solution([[1, 2], [3, 4]],	[[5, 6], [7, 8]],	0)
-print(result)
