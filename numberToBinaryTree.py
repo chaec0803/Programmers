@@ -29,8 +29,6 @@ def solution(numbers):
 
         tree = binary.rjust(full_len, '0')
 
-        print(n, k, binary, full_len)
-
         answer.append(1 if is_valid(tree) else 0)
 
     return answer
